@@ -20,7 +20,7 @@ int accept_conn(int);
     #define GetCurrentDir getcwd
  #endif
 
-#define MAXLINE 4096 /*max text line length*/
+#define MAXLINE 409600 /*max text line length*/
 #define LISTENQ 8 /*maximum number of client connections*/
 
 int main (int argc, char **argv)

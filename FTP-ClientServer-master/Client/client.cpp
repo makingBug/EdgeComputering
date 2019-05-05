@@ -19,14 +19,13 @@ int create_socket(int,char *);
     #define GetCurrentDir getcwd
  #endif
 
-#define MAXLINE 4096 /*max text line length*/
+#define MAXLINE 409600 /*max text line length*/
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
- int sockfd;
- struct sockaddr_in servaddr;
- char sendline[MAXLINE], recvline[MAXLINE];
+	int sockfd;
+	struct sockaddr_in servaddr;
+	char sendline[MAXLINE], recvline[MAXLINE];
 
  //basic check of the arguments
  //additional checks can be inserted
