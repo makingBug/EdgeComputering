@@ -1,3 +1,4 @@
+#include<iostream>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,7 +10,7 @@
 #define LENGTH_OF_LISTEN_QUEUE 20
 #define BUFFER_SIZE 1024
 #define FILE_NAME_MAX_SIZE 512
-
+using namespace std;
 int main(int argc, const char * argv[]) {
     
     // 声明并初始化一个服务器端的socket地址结构
@@ -64,17 +65,18 @@ int main(int argc, const char * argv[]) {
         printf("%s\n", file_name);
         
         // 打开文件并读取文件数据
-        FILE *fp = fopen(file_name, "r");
+        FILE *fp = fopen(file_name, "w");
         if(NULL == fp){
-            printf("File:%s Not Found\n", file_name);
+            cout<<"文件"<<file_name<<"创建失败"<<endl;
         }else{
             bzero(buffer, BUFFER_SIZE);
             int length = 0;
             int allCount = 0;
             // 每读取一段数据，便将其发送给客户端，循环直到文件读完为止
-            while((length = (int)fread(buffer, sizeof(char), BUFFER_SIZE, fp)) > 0){
-                if(send(new_server_socket_fd, buffer, length, 0) < 0){
-                    printf("Send File:%s Failed./n", file_name);
+            //
+            while((length = (int)recv(new_server_socket_fd,buffer,BUFFER_SIZE,0)) > 0){
+                if(fwrite(buffer,sizeof(char),length,fp) < length){
+                    cout<<"文件 "<<file_name<<" 写入失败"<<endl;
                     break;
                 }
                 allCount++;

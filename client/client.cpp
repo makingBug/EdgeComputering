@@ -62,38 +62,36 @@ int main(int argc, char **argv)
     }
 
     //输入文件名，并放到缓冲区buffer中等待发送
-    string file_name;
-    string file_save_name;
-    cout<<"请输入服务器端的文件名：";
-    cin>>file_name;
-    cout<<"请输入保存在本地的文件名：";
-    cin>>file_save_name;
+    string send_file_name;
+    
+    cout<<"要发送的文件名：";
+    cin>>send_file_name;
 
     char buffer[BUFFER_SIZE];
     bzero(buffer,BUFFER_SIZE);
-    strncpy(buffer,file_name.c_str(),file_name.length()>BUFFER_SIZE?BUFFER_SIZE:file_name.length());//将file_name的前n个字符串拷贝到buffer中
+    strncpy(buffer,send_file_name.c_str(),send_file_name.length()>BUFFER_SIZE?BUFFER_SIZE:send_file_name.length());//将file_name的前n个字符串拷贝到buffer中
 
     //向服务端发送buffer中的数据
-    if(send(client_socket_fd,buffer,BUFFER_SIZE,0) < 0){
+    if(send(client_socket_fd,buffer,send_file_name.length(),0) < 0){
         cout<<"发送文件名失败"<<endl;
         exit(1);
     }
 
     //打开文件，准备写入
-    FILE *fp = fopen(file_save_name.c_str(),"w");
+    FILE *fp = fopen(send_file_name.c_str(),"r");
     if(NULL==fp){
-        cout<<"文件 "<<file_name<<" 打开失败"<<endl;
+        cout<<"文件 "<<send_file_name<<" 读取失败！"<<endl;
         exit(1);
     }
-
+    cout<<"send_file_name = "<<send_file_name<<endl;
     //从服务端接收数据到buffer中
     //每接收一段数据，将其写入内存中，循环直到文件接收写玩为止
     bzero(buffer,BUFFER_SIZE);
     int length = 0;
     int allCount = 0;
-    while((length = (int)recv(client_socket_fd,buffer,BUFFER_SIZE,0)) > 0){
-        if(fwrite(buffer,sizeof(char),length,fp) < length){
-            cout<<"文件 "<<file_save_name<<" 写入失败"<<endl;
+    while((length = (int)fread(buffer, sizeof(char), BUFFER_SIZE, fp)) > 0){
+        if(send(client_socket_fd, buffer, length, 0) < 0){
+            cout<<"文件"<<send_file_name<<"发送失败！"<<endl;
             break;
         }
         allCount += length;
@@ -101,7 +99,7 @@ int main(int argc, char **argv)
     }
     
     //接收成功后，关闭文件，关闭socket
-    cout<<"从服务端收到文件 "<<file_save_name<<" 成功!  "<<"  共"<<allCount<<" 字节"<<endl;
+    cout<<"发送"<<send_file_name<<"成功!  "<<"  共"<<allCount<<" 字节"<<endl;
     fclose(fp);
     close(client_socket_fd);
     return 0;
