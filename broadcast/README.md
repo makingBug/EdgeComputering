@@ -1,0 +1,6 @@
+1. getIpSingle.cpp文件时获取本机IP地址
+2. client_UDP.cpp和server_UDP.cpp文件是获取本地局域网下的ip地址。由client_UDP.cpp文件所在的机器发送广播，server_UDP.cpp文件所在的机器接受该广播包会给数据来源的机器发送一个数据包。这样client_UDP.cpp所在的机器根据每个机器发来的数据包中包含IP地址，就可以直到他们的IP地址了。
+
+- 原理：主要时根据recvfrom函数中有一个参数时接受到数据的IP地址，这样就获取到所有局域网下的IP地址了。
+
+# 待解决问题：如何知道局域网中由多少台机器。
