@@ -16,6 +16,16 @@
 using namespace std;
 
 
+//根据ip地址算出端口
+int split(string &s){
+	int i;
+	for(i=s.size()-1;i>0;i--){
+		if(s[i]=='.')
+			break;
+	}
+	return std::stoi(s.substr(i+1,s.size()-i));
+}
+
 int main()
 {
 	map<string,int>m;
@@ -70,12 +80,13 @@ int main()
 			recvfrom(socket_fd,recv_buf,1024,0,(struct sockaddr *)&user_addr,&size);
 			strcpy(my_ip,inet_ntoa(user_addr.sin_addr));
 			string s(my_ip);
-			m[s]=100;
+
+			m[s]=split(s)+10000;
 		}
 		
 		//输出当前IP
 		for(auto it = m.begin();it!=m.end();it++){
-			cout<<it->first<<endl;
+			cout<<it->first<<"   "<<it->second<<endl;
 		}
 		sleep(3);
 	}
