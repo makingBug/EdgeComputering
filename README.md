@@ -5,5 +5,7 @@ client和server目录下是一个socket传输文件的demo
 实现version1:客户端可以向服务端发送文件
 
 broadcast目录存放有关获取局域网IP的文件
+client_UDP中定义了map<string,int>m  
+key存放ip,value存放对应的端口号
 
 
