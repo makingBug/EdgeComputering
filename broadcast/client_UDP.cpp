@@ -11,18 +11,20 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <map>
-
+#include <fcntl.h>
+#include<string>
 using namespace std;
 
 
 int main()
 {
-	map<string,int>map;
+	map<string,int>m;
 	struct sockaddr_in user_addr,my_addr;
   	char my_ip[13];
   	int socket_fd;
   	int so_broadcast=1;
-  	char buf[1024];
+  	char send_buf[1024];
+	char recv_buf[1024];
    	socklen_t size;
   
     my_addr.sin_family=AF_INET;
@@ -39,21 +41,43 @@ int main()
         exit(1);
     }
    	setsockopt(socket_fd,SOL_SOCKET,SO_BROADCAST,&so_broadcast,sizeof(so_broadcast));//??socket发送的数据具有广播特性
+
+	//设置成非堵塞
+	int flag = fcntl(socket_fd, F_GETFL, 0);
+    if (flag < 0) {
+        perror("fcntl F_GETFL fail");
+        exit(1);
+    }
+    if (fcntl(socket_fd, F_SETFL, flag | O_NONBLOCK) < 0) {
+        perror("fcntl F_SETFL fail");
+    }
  
+
+
    	if((bind(socket_fd,(struct sockaddr *)&user_addr, sizeof(struct sockaddr)))==-1) {
 		perror("bind");
 		exit(1);
     }
  
-    strcpy(buf,"broadcast test");
-    sendto(socket_fd,buf,strlen(buf),0,(struct sockaddr *)&my_addr,sizeof(my_addr));
+    strcpy(send_buf,"broadcast test");
+    
     size=sizeof(user_addr);
 	while(true){
+		m.clear();
+		sendto(socket_fd,send_buf,strlen(send_buf),0,(struct sockaddr *)&my_addr,sizeof(my_addr));
+		for(int i=0;i<10;i++){
+			sleep(0.1);
+			recvfrom(socket_fd,recv_buf,1024,0,(struct sockaddr *)&user_addr,&size);
+			strcpy(my_ip,inet_ntoa(user_addr.sin_addr));
+			string s(my_ip);
+			m[s]=100;
+		}
 		
-		recvfrom(socket_fd,buf,1024,0,(struct sockaddr *)&user_addr,&size);
-		strcpy(my_ip,inet_ntoa(user_addr.sin_addr));
-		string s(my_ip);
-		cout<<"IP = "<<s<<endl;
+		//输出当前IP
+		for(auto it = m.begin();it!=m.end();it++){
+			cout<<it->first<<endl;
+		}
+		sleep(3);
 	}
     
 }

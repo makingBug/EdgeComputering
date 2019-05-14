@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <fcntl.h>
+
 using namespace std;
 
 int main()
@@ -43,9 +45,12 @@ int main()
     }
  
     size=sizeof(user_addr);
-    recvfrom(socket_fd,buf,1024,0,(struct sockaddr *)&user_addr,&size);
-	sendto(socket_fd,buf,strlen(buf),0,(struct sockaddr *)&user_addr,sizeof(user_addr));
+	while(true){
+		recvfrom(socket_fd,buf,1024,0,(struct sockaddr *)&user_addr,&size);
+		sendto(socket_fd,buf,strlen(buf),0,(struct sockaddr *)&user_addr,sizeof(user_addr));
+		
+		cout<<"服务端发送了"<<buf<<endl;
+	}
     
-	cout<<"服务端发送了"<<buf<<endl;
 	return 0;
 }
